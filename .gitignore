@@ -1,0 +1,14 @@
+.lib
+.7z
+.dll
+.exe
+.zip
+.xlsx
+.xls
+.nupkg
+.suo
+.IsolatorCache.user
+.vs
+.csproj.user
+bin
+obj
