@@ -7,7 +7,7 @@ namespace AoC2022
     {
         #region Fields
 
-        private static int mCurrentDay = 4;
+        private static int mCurrentDay = 6;
 
         #endregion Fields
 
