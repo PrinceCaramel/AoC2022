@@ -46,20 +46,20 @@ namespace AoC2022.Days
 
         public void ComputesData()
         {
-            this.mInstructions = Utils.GetInputData(this).ToList();
-            this.mRoot = new ElfFolder("/");
+            this.mInstructions = Utils.GetInputData(this, true).ToList();
+            this.mRoot = new ElfFolder(null, "/");
             ElfFolder lCurrentFolder = this.mRoot;
             foreach (string lInstruction in this.mInstructions) 
             {
                 if (this.IsFile(lInstruction))
                 {
                     string[] lSplit = lInstruction.Split(' ');
-                    lCurrentFolder.AddChild(new ElfFile(lSplit[1], int.Parse(lSplit[0])));
+                    lCurrentFolder.AddChild(new ElfFile(lCurrentFolder, lSplit[1], int.Parse(lSplit[0])));
                 }
                 else if (this.IsFolder(lInstruction))
                 {
                     string[] lSplit = lInstruction.Split(' ');
-                    lCurrentFolder.AddChild(new ElfFolder(lSplit[1]));
+                    lCurrentFolder.AddChild(new ElfFolder(lCurrentFolder, lSplit[1]));
                 }
                 else if (this.IsCD(lInstruction))
                 {
@@ -108,36 +108,68 @@ namespace AoC2022.Days
 
     public interface IFileSystemElement
     {
+        #region Properties
+
         int Size { get; }
+
+        #endregion Properties
     }
 
     public class ElfFolder : ATreeElement, IFileSystemElement
     {
-        public ElfFolder(string pName)
-        {
-            this.Id = pName;
-        }
+        #region Properties
 
         public int Size => this.Children.Select(pChild => (pChild as IFileSystemElement).Size).Sum();
+
+        protected override Func<string> DisplaybleInformation => () => string.Format("FOLDER (size: {0}) ", this.Size);
+
+        #endregion Properties
+
+        #region Constructors
+
+        public ElfFolder(ElfFolder pParentFolder, string pName) : base(pParentFolder, pName)
+        {
+        }
+
+        #endregion Constructors
+
+        #region Methods
 
         public ElfFolder GetFolder(string pId)
         {
             return this.Children.OfType<ElfFolder>().FirstOrDefault(pFolder => pFolder.Id.Equals(pId));
         }
+
+        #endregion Methods
     }
 
     public class ElfFile : ATreeElement, IFileSystemElement
     {
+        #region Properties
+
         public int Size { get; private set; }
-        public ElfFile(string pFileName, int pSize)
+
+        protected override Func<string> DisplaybleInformation => () => string.Format("FILE (size: {0}) ", this.Size);
+
+
+        #endregion Properties
+
+        #region Constructors
+
+        public ElfFile(ElfFolder pParentFolder, string pFileName, int pSize) : base(pParentFolder, pFileName)
         {
-            this.Id = pFileName;
             this.Size = pSize;
         }
+
+        #endregion Constructors
+
+        #region Methods
 
         public override void AddChild(ATreeElement pChild)
         {
             //Do nothing.
         }
+
+        #endregion Methods
     }
 }
