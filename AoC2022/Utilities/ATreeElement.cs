@@ -15,6 +15,7 @@ namespace AoC2022.Utilities
         #endregion Fields
 
         #region Properties
+
         public string Id { get; protected set; }
 
         public ATreeElement Parent
@@ -64,6 +65,7 @@ namespace AoC2022.Utilities
         #endregion Constructors
 
         #region Methods
+
         public virtual void AddChild(ATreeElement pChild)
         {
             pChild.Parent = this;

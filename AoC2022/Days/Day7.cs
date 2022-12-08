@@ -108,11 +108,7 @@ namespace AoC2022.Days
 
     public interface IFileSystemElement
     {
-        #region Properties
-
         int Size { get; }
-
-        #endregion Properties
     }
 
     public class ElfFolder : ATreeElement, IFileSystemElement
@@ -120,7 +116,6 @@ namespace AoC2022.Days
         #region Properties
 
         public int Size => this.Children.Select(pChild => (pChild as IFileSystemElement).Size).Sum();
-
         protected override Func<string> DisplaybleInformation => () => string.Format("FOLDER (size: {0}) ", this.Size);
 
         #endregion Properties
@@ -148,9 +143,7 @@ namespace AoC2022.Days
         #region Properties
 
         public int Size { get; private set; }
-
         protected override Func<string> DisplaybleInformation => () => string.Format("FILE (size: {0}) ", this.Size);
-
 
         #endregion Properties
 
