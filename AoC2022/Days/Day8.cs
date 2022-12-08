@@ -93,7 +93,7 @@ namespace AoC2022.Days
             lTemp.Reverse();
             lScore = lScore * this.GetAmountOfLowerTrees(lValue, lTemp);
 
-            //Left
+            //Right
             lTemp = this.mMap.ElementAt(pY).GetRange(pX + 1, this.mWidth - 1 - pX).ToList();
             lScore = lScore * this.GetAmountOfLowerTrees(lValue, lTemp);
 
@@ -102,7 +102,7 @@ namespace AoC2022.Days
             lTemp.Reverse();
             lScore = lScore * this.GetAmountOfLowerTrees(lValue, lTemp);
 
-            //Top
+            //Bottom
             lTemp = this.mMap.GetRange(pY + 1, this.mHeight - 1 - pY).Select(pLine => pLine.ElementAt(pX)).ToList();
             lScore = lScore * this.GetAmountOfLowerTrees(lValue, lTemp);
 
