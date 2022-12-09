@@ -163,50 +163,19 @@ namespace AoC2022.Days
 
         public Position Follow(Position pPositionToFollow)
         {
-            Position lDifference = pPositionToFollow - this;
-            //UR
-            if (lDifference.Equals(new Position(1 , 2)) || lDifference.Equals(new Position(2, 1)) || lDifference.Equals(new Position(2, 2)))
+            if (this.X == pPositionToFollow.X)
             {
-                return this.Move(Direction.U).Move(Direction.R);
+                return pPositionToFollow.Y > this.Y ? this.Move(Direction.U) : this.Move(Direction.D);
             }
-            //R
-            else if (lDifference.Equals(new Position(2, 0)))
+            else if (this.Y == pPositionToFollow.Y)
             {
-                return this.Move(Direction.R);
-            }
-            //DR
-            else if (lDifference.Equals(new Position(2, -1)) || lDifference.Equals(new Position(1, -2)) || lDifference.Equals(new Position(2, -2)))
-            {
-                return this.Move(Direction.D).Move(Direction.R);
-            }
-            //D
-            else if (lDifference.Equals(new Position(0, -2)))
-            {
-                return this.Move(Direction.D);
-            }
-            //DL
-            else if (lDifference.Equals(new Position(-1, -2)) || lDifference.Equals(new Position(-2, -1)) || lDifference.Equals(new Position(-2, -2)))
-            {
-                return this.Move(Direction.D).Move(Direction.L);
-            }
-            //L
-            else if (lDifference.Equals(new Position(-2, 0)))
-            {
-                return this.Move(Direction.L);
-            }
-            //UL
-            else if (lDifference.Equals(new Position(-2, 1)) || lDifference.Equals(new Position(-1, 2)) || lDifference.Equals(new Position(-2, 2)))
-            {
-                return this.Move(Direction.U).Move(Direction.L);
-            }
-            //U
-            else if (lDifference.Equals(new Position(0, 2)))
-            {
-                return this.Move(Direction.U);
+                return pPositionToFollow.X > this.X ? this.Move(Direction.R) : this.Move(Direction.L);
             }
             else
             {
-                return this;
+                Position lTemp = this;
+                lTemp = pPositionToFollow.Y > lTemp.Y ? lTemp.Move(Direction.U) : this.Move(Direction.D);
+                return pPositionToFollow.X > lTemp.X ? lTemp.Move(Direction.R) : lTemp.Move(Direction.L);
             }
         }
     }
