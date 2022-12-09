@@ -14,30 +14,32 @@ namespace AoC2022.Days
 
         List<Move> mMoves = new List<Move>();
         List<Position> mTailsVisitedPositions = new List<Position>();
-        List<Position> mRopeBodyPartsPosition = new List<Position>();
-        Position mCurrentTailPosition;
-        Position mCurrentHeadPosition;
+        List<Position> mRopeKnotsPosition = new List<Position>();
 
-        # endregion Fields
+        #endregion Fields
+
+        #region Properties
+
+        public Position Tail
+        {
+            get
+            {
+                return this.mRopeKnotsPosition.Last();
+            }
+        }
+
+        #endregion Properties
 
         #region Methods
 
         public string GetFirstPuzzle()
         {
-            this.mCurrentTailPosition = new Position(0, 0);
-            this.mCurrentHeadPosition = new Position(0, 0);
-            this.mRopeBodyPartsPosition.Add(new Position(0, 0));
-            this.mTailsVisitedPositions.Add(this.mCurrentTailPosition);
-            foreach (Move lMove in this.mMoves)
-            {
-                this.ComputeMove(lMove);
-            }
-            return this.mTailsVisitedPositions.Count().ToString();
+            return this.ComputePuzzle(2);
         }
 
         public string GetSecondPuzzle()
         {
-            return "";
+            return this.ComputePuzzle(10);
         }
 
         public void ComputesData()
@@ -50,24 +52,60 @@ namespace AoC2022.Days
             }
         }
 
+        private string ComputePuzzle(int pKnots)
+        {
+            this.BuildRope(pKnots);
+            this.mTailsVisitedPositions.Clear();
+            this.AddTailPosition();
+            foreach (Move lMove in this.mMoves)
+            {
+                this.ComputeMove(lMove);
+            }
+            return this.mTailsVisitedPositions.Count().ToString();
+        }
+
         private void ComputeMove(Move pMove)
         {
             for (int lStep = 0; lStep < pMove.Steps; lStep++)
             {
-                this.mCurrentHeadPosition = this.mCurrentHeadPosition.Move(pMove.Direction);
-                if (this.mCurrentTailPosition.ShouldBodyPartMove(this.mCurrentHeadPosition))
-                {
-                    this.MoveTail();
-                }
+                this.mRopeKnotsPosition[0] = this.mRopeKnotsPosition[0].Move(pMove.Direction);
+                this.MoveKnots();
+                this.AddTailPosition();
             }
         }
 
-        private void MoveTail()
+        private void BuildRope(int pKnot)
         {
-            this.mCurrentTailPosition = this.mCurrentTailPosition.Follow(this.mCurrentHeadPosition);
-            if (!this.mTailsVisitedPositions.Contains(this.mCurrentTailPosition))
+            this.mRopeKnotsPosition.Clear();
+            for (int lCount = 0; lCount < pKnot; lCount++)
             {
-                this.mTailsVisitedPositions.Add(this.mCurrentTailPosition);
+                this.mRopeKnotsPosition.Add(new Position(0, 0));
+            }
+        }
+
+        private void MoveKnots()
+        {
+            for (int lKnotIndex = 1; lKnotIndex < this.mRopeKnotsPosition.Count; lKnotIndex++)
+            {
+                Position lCurrent = this.mRopeKnotsPosition.ElementAt(lKnotIndex);
+                Position lNext = this.mRopeKnotsPosition.ElementAt(lKnotIndex - 1); // Next ahead of him.
+                if (lCurrent.ShouldMove(lNext))
+                {
+                    this.mRopeKnotsPosition[lKnotIndex] = lCurrent.Follow(lNext);
+                }
+                else
+                {
+                    break;
+                }
+            }
+            
+        }
+
+        private void AddTailPosition()
+        {
+            if (!this.mTailsVisitedPositions.Contains(this.Tail))
+            {
+                this.mTailsVisitedPositions.Add(this.Tail);
             }
         }
 
@@ -117,7 +155,7 @@ namespace AoC2022.Days
             }
         }
 
-        public bool ShouldBodyPartMove(Position pNextBodyPart)
+        public bool ShouldMove(Position pNextBodyPart)
         {
             return Math.Abs(this.X - pNextBodyPart.X) >= 2 ||
                 Math.Abs(this.Y - pNextBodyPart.Y) >= 2;
@@ -127,7 +165,7 @@ namespace AoC2022.Days
         {
             Position lDifference = pPositionToFollow - this;
             //UR
-            if (lDifference.Equals(new Position(1 , 2)) || lDifference.Equals(new Position(2, 1)))
+            if (lDifference.Equals(new Position(1 , 2)) || lDifference.Equals(new Position(2, 1)) || lDifference.Equals(new Position(2, 2)))
             {
                 return this.Move(Direction.U).Move(Direction.R);
             }
@@ -137,7 +175,7 @@ namespace AoC2022.Days
                 return this.Move(Direction.R);
             }
             //DR
-            else if (lDifference.Equals(new Position(2, -1)) || lDifference.Equals(new Position(1, -2)))
+            else if (lDifference.Equals(new Position(2, -1)) || lDifference.Equals(new Position(1, -2)) || lDifference.Equals(new Position(2, -2)))
             {
                 return this.Move(Direction.D).Move(Direction.R);
             }
@@ -147,7 +185,7 @@ namespace AoC2022.Days
                 return this.Move(Direction.D);
             }
             //DL
-            else if (lDifference.Equals(new Position(-1, -2)) || lDifference.Equals(new Position(-2, -1)))
+            else if (lDifference.Equals(new Position(-1, -2)) || lDifference.Equals(new Position(-2, -1)) || lDifference.Equals(new Position(-2, -2)))
             {
                 return this.Move(Direction.D).Move(Direction.L);
             }
@@ -157,7 +195,7 @@ namespace AoC2022.Days
                 return this.Move(Direction.L);
             }
             //UL
-            else if (lDifference.Equals(new Position(-2, 1)) || lDifference.Equals(new Position(-1, 2)))
+            else if (lDifference.Equals(new Position(-2, 1)) || lDifference.Equals(new Position(-1, 2)) || lDifference.Equals(new Position(-2, 2)))
             {
                 return this.Move(Direction.U).Move(Direction.L);
             }
