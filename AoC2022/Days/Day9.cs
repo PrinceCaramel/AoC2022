@@ -131,8 +131,6 @@ namespace AoC2022.Days
         public double X { get; }
         public double Y { get; }
 
-        public static Position operator -(Position pPosition1, Position pPosition2) => new Position(pPosition1.X - pPosition2.X, pPosition1.Y - pPosition2.Y);
-
         public override string ToString()
         {
             return string.Format("x:{0} y:{1}", this.X, this.Y);
