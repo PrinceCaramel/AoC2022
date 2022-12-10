@@ -26,16 +26,6 @@ namespace AoC2022.Days
 
         public string GetFirstPuzzle()
         {
-            this.InitializeData();
-            for (int lCycleCount = 0; lCycleCount < 500; lCycleCount++)
-            {
-                this.RunCycle();
-                if (!this.mInstructions.Any())
-                {
-                    break;
-                }
-            }
-
             return this.mSignal.ToString();
         }
 
@@ -51,6 +41,15 @@ namespace AoC2022.Days
         {
             string lNoop = "noop";
             this.mInstructions = Utils.GetInputData(this).Select(pLine => pLine.StartsWith(lNoop) ? new CPUInstruction(1, 0) : new CPUInstruction(2, int.Parse(pLine.Remove(0, 5)))).ToList();
+            this.InitializeData();
+            for (int lCycleCount = 0; lCycleCount < 500; lCycleCount++)
+            {
+                this.RunCycle();
+                if (!this.mInstructions.Any())
+                {
+                    break;
+                }
+            }
         }
 
         private void InitializeData()
