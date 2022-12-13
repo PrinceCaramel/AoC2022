@@ -11,7 +11,7 @@ namespace AoC2022.Days
     public class Day13 : IDay
     {
         #region Fields
-        //753 too low
+
         List<Tuple<Packet, Packet>> mPacketPairs = new List<Tuple<Packet, Packet>>();
 
         # endregion Fields
@@ -23,14 +23,9 @@ namespace AoC2022.Days
             int lResult = 0;
             foreach (Tuple<Packet, Packet> lPair in this.mPacketPairs)
             {
-                if (this.ComparePacket(lPair.Item1, lPair.Item2))
+                if (lPair.Item1.IsInferior(lPair.Item2))
                 {
-                    Console.WriteLine("RightOrder");
                     lResult += int.Parse(lPair.Item1.Id);
-                }
-                else
-                {
-                    Console.WriteLine("WrongOrder");
                 }
             }
             return lResult.ToString();
@@ -38,66 +33,39 @@ namespace AoC2022.Days
 
         public string GetSecondPuzzle()
         {
-            return "";
+            List<Packet> lPackets = new List<Packet>();
+            this.mPacketPairs.ForEach(pPair => lPackets.Add(pPair.Item1));
+            this.mPacketPairs.ForEach(pPair => lPackets.Add(pPair.Item2));
+            Packet l2Packet = this.CreatePacket(2, "PACKET2");
+            Packet l6Packet = this.CreatePacket(6, "PACKET6");
+            lPackets.Add(l2Packet);
+            lPackets.Add(l6Packet);
+            lPackets.Sort((pPackL, pPackR) => pPackL.CompareTo(pPackR));
+
+            int lIndexOf2 = lPackets.IndexOf(l2Packet) + 1;
+            int lIndexOf6 = lPackets.IndexOf(l6Packet) + 1;
+            return (lIndexOf2 * lIndexOf6).ToString();
+        }
+
+        private Packet CreatePacket(int pValue, string pId)
+        {
+            Packet lRoot = new Packet(null, pId);
+            Packet lFirstChild = new Packet(null, pId);
+            PacketInt lValue = new PacketInt(null, pId, pValue);
+            lFirstChild.AddChild(lValue);
+            lRoot.AddChild(lFirstChild);
+            return lRoot;
         }
 
         public void ComputesData()
         {
-            IEnumerable<string> lData = Utils.GetInputData(this, true).ToList();
+            IEnumerable<string> lData = Utils.GetInputData(this).ToList();
             for (int lCounter = 0; lCounter <= lData.Count() / 3; lCounter++)
             {
                 Packet lLeft = this.ComputePacket(lData.ElementAt(lCounter * 3), lCounter + 1);
                 Packet lRight = this.ComputePacket(lData.ElementAt(lCounter * 3 + 1), lCounter + 1);
                 this.mPacketPairs.Add(new Tuple<Packet, Packet>(lLeft, lRight));
             }
-        }
-
-        private bool ComparePacket(Packet pLeft, Packet pRight)
-        {
-            bool lResult = true;
-            int lMinCount = Math.Min(pLeft.Children.Count(), pRight.Children.Count());
-            for (int lCount = 0; lCount < lMinCount; lCount++)
-            {
-                if (pLeft.Children[lCount] is PacketInt lIntLeft && pRight.Children[lCount] is PacketInt lIntRight)
-                {
-                    //Console.WriteLine(string.Format("Compare {0} vs {1}", lIntLeft, lIntRight));
-                    if (!lIntLeft.IsEqual(lIntRight))
-                    {
-                        return lIntRight.IsSuperior(lIntLeft);
-                    }
-                }
-                else if (pLeft.Children[lCount] is Packet lNewLeft && pRight.Children[lCount] is Packet lNewRight)
-                {
-                    lResult &= this.ComparePacket(lNewLeft, lNewRight);
-                }
-                else
-                {
-                    Packet lLeft = pLeft.Children[lCount] as Packet;
-                    Packet lRight = pRight.Children[lCount] as Packet;
-                    if (lLeft == null)
-                    {
-                        lLeft = new Packet(null, pLeft.Id);
-                        PacketInt lOldLeft = pLeft.Children[lCount] as PacketInt;
-                        PacketInt lNewIntLeft = new PacketInt(lLeft, lOldLeft.Id, lOldLeft.Value);
-                        lLeft.AddChild(lNewIntLeft);
-                    }
-                    else
-                    {
-                        lRight = new Packet(null, pRight.Id);
-                        PacketInt lOldRight = pRight.Children[lCount] as PacketInt;
-                        PacketInt lNewIntRight = new PacketInt(lRight, lOldRight.Id, lOldRight.Value);
-                        lRight.AddChild(lNewIntRight);
-                    }
-                    lResult &= this.ComparePacket(lLeft, lRight);
-                }
-            }
-
-            if (pLeft.Children.Count() != pRight.Children.Count())
-            {
-                lResult &= pLeft.Children.Count() == lMinCount;
-            }
-
-            return lResult;
         }
 
         private Packet ComputePacket(string pLine, int pCounter)
@@ -145,7 +113,7 @@ namespace AoC2022.Days
         #endregion Methods
     }
 
-    public class Packet : ATreeElement
+    public class Packet : ATreeElement, IComparable
     {
         #region Constructors
 
@@ -156,10 +124,89 @@ namespace AoC2022.Days
         #region Methods
 
         protected override Func<string> DisplaybleInformation => () => string.Format(" [{0}]", string.Join(",", this.Children.Select(pChild => pChild.ToString())));
+
+        public int CompareTo(object pPacketToCompareTo)
+        {
+            Packet lPacket = pPacketToCompareTo as Packet;
+            if (this == lPacket)
+            {
+                return 0;
+            }
+            else if (this.IsInferior(lPacket))
+            {
+                return -1;
+            }
+            return 1;
+        }
+
+        public bool IsInferior(Packet pRight)
+        {
+            bool lResult = true;
+            Packet.ComparePacketProcess(this, pRight, ref lResult);
+            return lResult;
+        }
+
+        private static bool ComparePacketProcess(Packet pLeft, Packet pRight, ref bool pResult)
+        {
+            bool lShouldContinue = true;
+            int lMinCount = Math.Min(pLeft.Children.Count(), pRight.Children.Count());
+            for (int lCount = 0; lCount < lMinCount; lCount++)
+            {
+                if (pLeft.Children[lCount] is PacketInt lIntLeft && pRight.Children[lCount] is PacketInt lIntRight)
+                {
+                    if (!lIntLeft.IsEqual(lIntRight))
+                    {
+                        pResult = lIntRight.IsSuperior(lIntLeft);
+                        return false;
+                    }
+                }
+                else if (pLeft.Children[lCount] is Packet lNewLeft && pRight.Children[lCount] is Packet lNewRight)
+                {
+                    lShouldContinue = Packet.ComparePacketProcess(lNewLeft, lNewRight, ref pResult);
+                }
+                else
+                {
+                    Packet lLeft = pLeft.Children[lCount] as Packet;
+                    Packet lRight = pRight.Children[lCount] as Packet;
+                    if (lLeft == null)
+                    {
+                        lLeft = new Packet(null, pLeft.Id);
+                        PacketInt lOldLeft = pLeft.Children[lCount] as PacketInt;
+                        PacketInt lNewIntLeft = new PacketInt(lLeft, lOldLeft.Id, lOldLeft.Value);
+                        lLeft.AddChild(lNewIntLeft);
+                    }
+                    else
+                    {
+                        lRight = new Packet(null, pRight.Id);
+                        PacketInt lOldRight = pRight.Children[lCount] as PacketInt;
+                        PacketInt lNewIntRight = new PacketInt(lRight, lOldRight.Id, lOldRight.Value);
+                        lRight.AddChild(lNewIntRight);
+                    }
+                    lShouldContinue = Packet.ComparePacketProcess(lLeft, lRight, ref pResult);
+                }
+                if (!lShouldContinue)
+                {
+                    break;
+                }
+            }
+
+            if (lShouldContinue)
+            {
+                if (pLeft.Children.Count() != pRight.Children.Count())
+                {
+                    pResult = pLeft.Children.Count() == lMinCount;
+                    lShouldContinue = false;
+                }
+            }
+
+            return lShouldContinue;
+        }
+
         public override string ToString()
         {
             return this.DisplaybleInformation();
         }
+
         #endregion Methods
     }
 
