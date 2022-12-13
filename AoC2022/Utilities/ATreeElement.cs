@@ -36,6 +36,14 @@ namespace AoC2022.Utilities
             }
         }
 
+        public bool IsRoot
+        {
+            get
+            {
+                return this.Parent == null;
+            }
+        }
+
         public List<ATreeElement> Children
         {
             get
