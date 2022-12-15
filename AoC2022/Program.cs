@@ -1,5 +1,8 @@
 ﻿using AoC2022.Interfaces;
 using AoC2022.Utilities;
+using System.Diagnostics;
+using System.Net;
+using System.Runtime.CompilerServices;
 
 namespace AoC2022
 {
@@ -8,6 +11,7 @@ namespace AoC2022
         #region Fields
 
         private static int mCurrentDay = 15;
+        private static bool mShouldTimeStamp = true;
 
         #endregion Fields
 
@@ -17,8 +21,60 @@ namespace AoC2022
         {
             DayChooser lDayChooser = new DayChooser();
             IDay lCurrentDay = lDayChooser.Of(mCurrentDay);
-            lCurrentDay.ComputesData();
-            Console.WriteLine(string.Format("Puzzle1 : {0}\nPuzzle2 : {1}", lCurrentDay.GetFirstPuzzle(), lCurrentDay.GetSecondPuzzle()));
+            ComputesData(lCurrentDay);
+            Console.WriteLine(string.Format("Puzzle1 : {0}\nPuzzle2 : {1}", GetFirstPuzzle(lCurrentDay), GetSecondPuzzle(lCurrentDay)));
+        }
+        
+        private static void ComputesData(IDay pDay)
+        {
+            if (mShouldTimeStamp)
+            {
+                Stopwatch lComputingStopWatch = new Stopwatch();
+                lComputingStopWatch.Start();
+                pDay.ComputesData();
+                lComputingStopWatch.Stop();
+                Console.WriteLine(string.Format("Computing data: {0}ms", lComputingStopWatch.ElapsedMilliseconds));
+            }
+            else
+            {
+                pDay.ComputesData();
+            }
+        }
+
+        private static string GetFirstPuzzle(IDay pDay)
+        {
+            string lResult = "";
+            if (mShouldTimeStamp)
+            {
+                Stopwatch lComputingStopWatch = new Stopwatch();
+                lComputingStopWatch.Start();
+                lResult = pDay.GetFirstPuzzle();
+                lComputingStopWatch.Stop();
+                lResult = string.Format("{0} (in {1}ms)", lResult, lComputingStopWatch.ElapsedMilliseconds);
+            }
+            else
+            {
+                lResult = pDay.GetFirstPuzzle();
+            }
+            return lResult;
+        }
+
+        private static string GetSecondPuzzle(IDay pDay)
+        {
+            string lResult = "";
+            if (mShouldTimeStamp)
+            {
+                Stopwatch lComputingStopWatch = new Stopwatch();
+                lComputingStopWatch.Start();
+                lResult = pDay.GetSecondPuzzle();
+                lComputingStopWatch.Stop();
+                lResult = string.Format("{0} (in {1}ms)", lResult, lComputingStopWatch.ElapsedMilliseconds);
+            }
+            else
+            {
+                lResult = pDay.GetSecondPuzzle();
+            }
+            return lResult;
         }
 
         #endregion Methods
