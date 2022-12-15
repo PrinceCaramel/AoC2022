@@ -162,48 +162,48 @@ namespace AoC2022.Days
         }
 
         #endregion Methods
-    }
 
-    public struct Coord
-    {
-        public int X { get; private set; }
-        public int Y { get; private set; }
-
-        public Coord(int pX, int pY)
+        public struct Coord
         {
-            this.X = pX;
-            this.Y = pY;
-        }
+            public int X { get; private set; }
+            public int Y { get; private set; }
 
-        public override string ToString()
-        {
-            return string.Format("{0}, {1}", this.X, this.Y);
-        }
+            public Coord(int pX, int pY)
+            {
+                this.X = pX;
+                this.Y = pY;
+            }
 
-        public static Coord CreateFromString(string pCoord)
-        {
-            string[] lSplit = pCoord.Split(',');
-            return new Coord(int.Parse(lSplit[0]), int.Parse(lSplit[1]));
-        }
+            public override string ToString()
+            {
+                return string.Format("{0}, {1}", this.X, this.Y);
+            }
 
-        public void Fall()
-        {
-            this.Y++;
-        }
+            public static Coord CreateFromString(string pCoord)
+            {
+                string[] lSplit = pCoord.Split(',');
+                return new Coord(int.Parse(lSplit[0]), int.Parse(lSplit[1]));
+            }
 
-        public void GoUp()
-        {
-            this.Y--;
-        }
+            public void Fall()
+            {
+                this.Y++;
+            }
 
-        public void RollLeft()
-        {
-            this.X--;
-        }
+            public void GoUp()
+            {
+                this.Y--;
+            }
 
-        public void RollRight()
-        {
-            this.X++;
+            public void RollLeft()
+            {
+                this.X--;
+            }
+
+            public void RollRight()
+            {
+                this.X++;
+            }
         }
     }
 
