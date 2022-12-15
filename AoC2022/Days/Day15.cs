@@ -163,7 +163,7 @@ namespace AoC2022.Days
             public Coord Left;
             public Coord Right;
 
-            public Int64  Length
+            public Int64 Length
             {
                 get { return Math.Abs(this.Right.X - this.Left.X) + 1; }
             }
@@ -201,24 +201,6 @@ namespace AoC2022.Days
             {
                 return string.Format("y:{0} [{1};{2}]", this.Left.Y, this.Left.X, this.Right.X);
             }
-        }
-
-        public struct Coord
-        {
-            public Int64 X;
-            public Int64 Y;
-            public bool IsValid { get => !this.Equals(Coord.InvalidValue); }
-            public Coord(Int64  pX, Int64  pY) { this. X = pX; this. Y = pY; }
-            public override string ToString()
-            {
-                return string.Format("{0},{1}", this.X, this.Y);
-            }
-
-            public static Coord operator +(Coord pC1, Coord pC2) => new Coord(pC1.X + pC2.X, pC1.Y + pC2.Y);
-            public static Coord operator -(Coord pC1, Coord pC2) => new Coord(pC1.X - pC2.X, pC1.Y - pC2.Y);
-
-            public static Coord Origin { get { return new Coord(0, 0); } }
-            public static Coord InvalidValue { get { return new Coord(Int64.MaxValue, Int64.MaxValue); } }
         }
     }
 }
