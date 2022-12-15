@@ -7,6 +7,7 @@ using System.Net.Http.Headers;
 using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
+using static AoC2022.Days.Day15;
 
 namespace AoC2022.Days
 {
@@ -65,18 +66,18 @@ namespace AoC2022.Days
             foreach (Segment lSegment in pAllSegments)
             {
                 Segment lFinalSegment = lSegment;
-                if (lSegmentsUnion.Any(pSegment => this.IsLeftIncludedInRight(lFinalSegment, pSegment)))
+                if (lSegmentsUnion.Any(pSegment => lFinalSegment.IsIncludedIn(pSegment)))
                 {
                     // Do nothing.
                 }
                 else
                 {
-                    lSegmentsUnion.RemoveAll(pSegment => this.IsLeftIncludedInRight(pSegment, lFinalSegment));
-                    while (lSegmentsUnion.Any(pSegment => this.Intersect(pSegment, lFinalSegment)))
+                    lSegmentsUnion.RemoveAll(pSegment => pSegment.IsIncludedIn(lFinalSegment));
+                    while (lSegmentsUnion.Any(pSegment => pSegment.Intersect(lFinalSegment)))
                     {
-                        Segment lIntersectingSegment = lSegmentsUnion.First(pSegment => this.Intersect(pSegment, lFinalSegment));
+                        Segment lIntersectingSegment = lSegmentsUnion.First(pSegment => pSegment.Intersect(lFinalSegment));
                         lSegmentsUnion.Remove(lIntersectingSegment);
-                        lFinalSegment = this.GetUnion(lIntersectingSegment, lFinalSegment);
+                        lFinalSegment = lIntersectingSegment.GetUnionWith(lFinalSegment);
                     }
                     lSegmentsUnion.Add(lFinalSegment);
                 }
@@ -112,26 +113,6 @@ namespace AoC2022.Days
             lResult[0] = lLeft;
             lResult[1] = lRight;
             return lResult;
-        }
-
-        private bool IsLeftIncludedInRight(Segment pSegment1, Segment pSegment2)
-        {
-            return (pSegment1.Left.X >= pSegment2.Left.X &&
-                pSegment1.Right.X <= pSegment2.Right.X);
-        }
-
-        private bool Intersect(Segment pSegment1, Segment pSegment2)
-        {
-            return (pSegment1.Right.X >= pSegment2.Left.X && pSegment1.Left.X <= pSegment2.Right.X) ||
-                (pSegment2.Right.X >= pSegment1.Left.X && pSegment2.Left.X <= pSegment1.Right.X);
-        }
-
-        private Segment GetUnion(Segment pSegment1, Segment pSegment2)
-        {
-            Int64  lY = pSegment1.Left.Y;
-            return new Segment(
-                new Coord(Math.Min(pSegment1.Left.X, pSegment2.Left.X), lY), 
-                new Coord(Math.Max(pSegment1.Right.X, pSegment2.Right.X), lY));
         }
 
         private IEnumerable<Coord> GetAllBeacons()
@@ -195,6 +176,26 @@ namespace AoC2022.Days
             {
                 this.Left = pLeft;
                 this.Right = pRight;
+            }
+
+            public bool IsIncludedIn(Segment pSegment)
+            {
+                return (this.Left.X >= pSegment.Left.X &&
+                    this.Right.X <= pSegment.Right.X);
+            }
+
+            public bool Intersect(Segment pSegment)
+            {
+                return (this.Right.X >= pSegment.Left.X && this.Left.X <= pSegment.Right.X) ||
+                    (pSegment.Right.X >= this.Left.X && pSegment.Left.X <= this.Right.X);
+            }
+
+            public Segment GetUnionWith(Segment pSegment)
+            {
+                Int64 lY = this.Left.Y;
+                return new Segment(
+                    new Coord(Math.Min(this.Left.X, pSegment.Left.X), lY),
+                    new Coord(Math.Max(this.Right.X, pSegment.Right.X), lY));
             }
 
             public override string ToString()
