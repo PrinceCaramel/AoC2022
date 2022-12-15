@@ -56,8 +56,13 @@ namespace AoC2022.Days
                 }
             }
 
+            return this.ReduceSegmentsList(lAllSensorsSegments);
+        }
+
+        private List<Segment> ReduceSegmentsList(List<Segment> pAllSegments)
+        {
             List<Segment> lSegmentsUnion = new List<Segment>();
-            foreach (Segment lSegment in lAllSensorsSegments)
+            foreach (Segment lSegment in pAllSegments)
             {
                 Segment lFinalSegment = lSegment;
                 if (lSegmentsUnion.Any(pSegment => this.IsLeftIncludedInRight(lFinalSegment, pSegment)))
