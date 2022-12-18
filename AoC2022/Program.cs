@@ -10,7 +10,7 @@ namespace AoC2022
     {
         #region Fields
 
-        private static int mCurrentDay = 18;
+        private static int mCurrentDay = 17;
         private static bool mShouldTimeStamp = true;
 
         #endregion Fields

@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection.Metadata.Ecma335;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using static AoC2022.Days.HLine;
@@ -34,7 +35,7 @@ namespace AoC2022.Days
 
         public void ComputesData()
         {
-            this.mJetPushes = Utils.GetInputData(this, true).ToList().First();
+            this.mJetPushes = Utils.GetInputData(this).ToList().First();
             this.mJetLength = this.mJetPushes.Length;
         }
 
@@ -43,7 +44,7 @@ namespace AoC2022.Days
             RockShapePooler lPooler = new RockShapePooler();
             int lCurrentTopPoint = -1;
             List<Coord> lTower= new List<Coord>();
-            for (int lCount = 0; lCount < 2023; lCount++)
+            for (int lCount = 0; lCount < 2022; lCount++)
             {
                 ARockShape lRock = lPooler.GetNextRockShape();
                 lRock.Init(lCurrentTopPoint);
@@ -58,12 +59,13 @@ namespace AoC2022.Days
                 lCurrentTopPoint = Math.Max(lCurrentTopPoint, (int)lRock.TopY);
                 lRock.AddShapeToGivenList(lTower);
             }
-            return lCurrentTopPoint;
+            return lCurrentTopPoint + 1;
         }
 
         private void PushRock(ARockShape pRock, IEnumerable<Coord> pTower)
         {
-            char lChar = this.mJetPushes[this.mCurrentPush % this.mJetLength];
+            int lCurrent = this.mCurrentPush % this.mJetLength;
+            char lChar = this.mJetPushes[lCurrent];
             if (lChar == '>')
             {
                 if (pRock.CanGoRight(pTower))
@@ -76,6 +78,22 @@ namespace AoC2022.Days
             }
 
             this.mCurrentPush++;
+        }
+
+        public void DrawTower(IEnumerable<Coord> pTower)
+        {
+            int lMax = (int)pTower.Max(pC => pC.Y);
+            for (int i = lMax; i >= 0; i--)
+            {
+                string lLine = string.Format("{0}{1}{2}{3}{4}{5}{6}", pTower.Contains(new Coord(0, i)) ? '#' : '.',
+                    pTower.Contains(new Coord(1, i)) ? '#' : '.',
+                    pTower.Contains(new Coord(2, i)) ? '#' : '.',
+                    pTower.Contains(new Coord(3, i)) ? '#' : '.',
+                    pTower.Contains(new Coord(4, i)) ? '#' : '.',
+                    pTower.Contains(new Coord(5, i)) ? '#' : '.',
+                    pTower.Contains(new Coord(6, i)) ? '#' : '.');
+                Console.WriteLine(lLine);
+            }
         }
 
         #endregion Methods
@@ -283,7 +301,7 @@ namespace AoC2022.Days
 
         public override bool CanGoRight(IEnumerable<Coord> pRocks)
         {
-            if (this.CurrentPosition.X == 6)
+            if (this.CurrentPosition.X + 1 == 6)
                 return false;
             return !pRocks.Contains(new Coord(this.CurrentPosition.X + 2, this.CurrentPosition.Y)) &&
                 !pRocks.Contains(new Coord(this.CurrentPosition.X + 2, this.CurrentPosition.Y + 1));
