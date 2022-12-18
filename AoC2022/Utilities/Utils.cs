@@ -105,4 +105,59 @@ namespace AoC2022.Utilities
             return lNeighbors;
         }
     }
+
+    public struct Coord3D
+    {
+        public Int64 X;
+        public Int64 Y;
+        public Int64 Z;
+        public bool IsValid { get => !this.Equals(Coord3D.InvalidValue); }
+        public Coord3D(Int64 pX, Int64 pY, Int64 pZ) { this.X = pX; this.Y = pY; this.Z = pZ; }
+        public override string ToString()
+        {
+            return string.Format("{0},{1},{2}", this.X, this.Y, this.Z);
+        }
+
+        public static Coord3D operator +(Coord3D pC1, Coord3D pC2) => new Coord3D(pC1.X + pC2.X, pC1.Y + pC2.Y, pC1.Z + pC2.Z);
+        public static Coord3D operator -(Coord3D pC1, Coord3D pC2) => new Coord3D(pC1.X - pC2.X, pC1.Y - pC2.Y, pC1.Z - pC2.Z);
+
+        public static Coord3D Origin { get { return new Coord3D(0, 0, 0); } }
+        public static Coord3D InvalidValue { get { return new Coord3D(Int64.MaxValue, Int64.MaxValue, Int64.MaxValue); } }
+
+        public List<Coord3D> GetNeighbors(int pMinX, int pMinY, int pMinZ, int pMaxX, int pMaxY, int pMaxZ)
+        {
+            List<Coord3D> lNeighbors = new List<Coord3D>();
+            if (this.X - 1 >= pMinX)
+            {
+                lNeighbors.Add(new Coord3D(this.X - 1, this.Y, this.Z));
+            }
+            if (this.Y - 1 >= pMinY)
+            {
+                lNeighbors.Add(new Coord3D(this.X, this.Y - 1, this.Z));
+            }
+            if (this.Z - 1 >= pMinZ)
+            {
+                lNeighbors.Add(new Coord3D(this.X, this.Y, this.Z - 1));
+            }
+            if (this.Y + 1 <= pMaxY)
+            {
+                lNeighbors.Add(new Coord3D(this.X, this.Y + 1, this.Z));
+            }
+            if (this.X + 1 <= pMaxX)
+            {
+                lNeighbors.Add(new Coord3D(this.X + 1, this.Y, this.Z));
+            }
+            if (this.Z + 1 <= pMaxZ)
+            {
+                lNeighbors.Add(new Coord3D(this.X, this.Y, this.Z + 1));
+            }
+            return lNeighbors;
+        }
+
+        public static Coord3D GetFromString(string pString)
+        {
+            Int64[] lSplit = pString.Split(',').Select(pInt => Int64.Parse(pInt)).ToArray();
+            return new Coord3D(lSplit[0], lSplit[1], lSplit[2]);
+        }
+    }
 }
